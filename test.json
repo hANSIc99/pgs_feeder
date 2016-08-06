@@ -1,0 +1,15 @@
+
+{
+    "data": {
+        "source": "edition.cnn.com",
+        "pub_date": "Sat, 06 Aug 2016 05:58:37 EDT",
+        "sys_time": 1470478879,
+        "result": [
+            {
+                "s_keyword": "to",
+                "u16_result": 29
+            }
+        ]
+    },
+    "PRGRM": "RSSReader"
+}
