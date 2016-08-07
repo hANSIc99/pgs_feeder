@@ -23,13 +23,15 @@
 #include <stdint.h>
 #include "struct.h"
 #include "decode_json.h"
+#include "pgs_interface.h"
 
 int main(int argc, const char *argv[]) {
 
-
+connect_db();
 
 if(argc < 2){
 	printf("\nError, expected JSON Object as argument.\n");
+	exit(1);
 }
 
 
