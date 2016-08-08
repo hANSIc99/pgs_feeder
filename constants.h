@@ -1,0 +1,1 @@
+#define MAX__KEYWORD_LENGHT 100

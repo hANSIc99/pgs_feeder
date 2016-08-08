@@ -6,9 +6,11 @@
 #include  <libpq-fe.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
+#include "constants.h"
 
-uint8_t connect_db();
-static void exit_nicely(PGconn *conn);
+uint8_t run_db();
+PGconn *connect_db();
 
 
 #endif

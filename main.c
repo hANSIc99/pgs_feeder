@@ -27,7 +27,10 @@
 
 int main(int argc, const char *argv[]) {
 
-connect_db();
+struct_data *sd_data;
+sd_data = malloc(sizeof(struct_data));
+
+run_db();
 
 if(argc < 2){
 	printf("\nError, expected JSON Object as argument.\n");
@@ -44,7 +47,7 @@ printf("\n%s\n", *argv);
 printf("\nString lenght: %d\n", (int)strlen(*argv));
 
 s_data(*argv);
-
+free(sd_data);
 return 0;
 
 }
