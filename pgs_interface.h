@@ -8,8 +8,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "constants.h"
+#include "struct.h"
 
-uint8_t run_db();
+uint8_t run_db(struct_data *sd_data);
 PGconn *connect_db();
 
 

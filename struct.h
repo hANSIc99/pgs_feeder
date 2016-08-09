@@ -36,14 +36,15 @@ typedef uint8_t bool;
 /* s_news = Name des Struct */
 typedef struct s_data {
 
-	uint16_t position;
+	uint16_t u16_position;
 
-	char *source;
-	char *program;
-	char *link;
-	char *sys_date;
+	char *s_source;
+	char *s_program;
+	char *s_link;
 
-	char *search_keyword[MAX_SEARCHKEYWORDS];
+	uint32_t  u32_sys_timestamp;
+
+	char *s_search_keyword[MAX_SEARCHKEYWORDS];
 	uint16_t u16_matches[MAX_SEARCHKEYWORDS];
 
 

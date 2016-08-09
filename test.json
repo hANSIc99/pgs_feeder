@@ -8,7 +8,15 @@
             {
                 "s_keyword": "to",
                 "u16_result": 29
-            }
+            },
+	    {
+		"s_keyword": "test",
+		"u16_result": 10
+	    },
+	    {
+		"s_keyword": "bla",
+		"u16_result": 25
+	    }
         ]
     },
     "PRGRM": "RSSReader"
