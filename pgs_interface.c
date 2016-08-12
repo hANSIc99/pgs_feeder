@@ -42,9 +42,9 @@ uint8_t run_db(struct_data *sd_data){
 	while((s_ptr=strpbrk(s_tmp_ptr, ".")) != NULL){
 
 
-	*s_ptr = '_' ;
-	s_tmp_ptr = s_ptr + 1;		
-	printf("\n dot found\n");
+		*s_ptr = '_' ;
+		s_tmp_ptr = s_ptr + 1;		
+		printf("\n dot found\n");
 
 	}
 	printf("\nNew table name: %s\n", s_table_name);	
@@ -57,16 +57,16 @@ uint8_t run_db(struct_data *sd_data){
 	strcpy(s_sql_cmd, CHECK_TABLE_1);
 	strcat(s_sql_cmd, s_table_name);
 	strcat(s_sql_cmd, CHECK_TABLE_2);
-	printf("\nSQL command before execution: \n%s", s_sql_cmd);
+	printf("\nSQL command before execution: \n%s\n\n", s_sql_cmd);
 	exec = PQexec(conn, s_sql_cmd );
 
 	free(s_sql_cmd);
 
- 	printf("\ntest source = %s\n", sd_data->s_source);
- 	printf("\npg_class result: %d\n", PQresultStatus(exec));
+	printf("\ntest source = %s\n", sd_data->s_source);
+	printf("\npg_class result: %d\n", PQresultStatus(exec));
 	printf("\npg_status as string: %s\n", PQresStatus(PQresultStatus(exec)));
 
-	if(PQntuples(exec) == 1){
+	if(PQntuples(exec)){
 		printf("\nTable excist: %d\n", PQntuples(exec));
 		PQclear(exec);
 	} else {
@@ -106,6 +106,7 @@ uint8_t run_db(struct_data *sd_data){
 
 
 	free(s_table_name);
+	return 0;
 }
 
 
@@ -128,10 +129,7 @@ PGconn *connect_db(){
 
 
 	}
-
-
-
-
+return 0;
 }
 
 
