@@ -1,13 +1,12 @@
 #include "decode_json.h"
 
 #define _POSIX_VERSION = 200112L
-#define DEBUG 0
+#define DEBUG 1
 
 struct_data *s_data(const char *json){
 
-	json_t *js_root, *js_data, *js_program, *js_result, *js_pub_date, *js_source, *js_sys_time, *js_result_obj, *js_array_obj;
+	json_t *js_root, *js_data, *js_program, *js_tmp, *js_result, *js_result_obj, *js_array_obj;
 	json_error_t error;
-	void *iter;
 	uint8_t u8_array_pos = 0;
 	struct_data *sd_data;
 	sd_data = malloc(sizeof(struct_data));
@@ -15,9 +14,6 @@ struct_data *s_data(const char *json){
 
 	js_root = NULL;
 	js_data = NULL;
-	js_pub_date = NULL;
-	js_source = NULL;
-	js_sys_time = NULL;
 	js_result = NULL;
 	js_result_obj = NULL;
 	js_array_obj = NULL;
@@ -34,7 +30,7 @@ struct_data *s_data(const char *json){
 
 
 
-	if((js_data = json_object_get(js_root, "data")) == NULL){
+	if(!(js_data = json_object_get(js_root, "data"))){
 
 		/* ERROR */
 
@@ -42,13 +38,13 @@ struct_data *s_data(const char *json){
 	}
 
 
-	if((js_result = json_object_get(js_data, "result")) == NULL){
+	if(!(js_result = json_object_get(js_data, "result"))){
 		/* ERROR */
 		printf("\nAn error occured while reading the JSON object\n");
 	}
 
 
-	while((js_result_obj = json_array_get(js_result, u8_array_pos)) != NULL){
+	while((js_result_obj = json_array_get(js_result, u8_array_pos))){
 
 		/* writing the keyword in struct */
 
@@ -68,31 +64,37 @@ struct_data *s_data(const char *json){
 	} 
 
 
-	if((js_source = json_object_get(js_data, "source")) != NULL){
+	if((js_tmp = json_object_get(js_data, "source"))){
 
-		sd_data->s_source = strdup(json_string_value(js_source));
+		sd_data->s_source = strdup(json_string_value(js_tmp));
 		if(DEBUG){
 			printf("\nSource: %s\n", sd_data->s_source);
 		}
 	}
+	if((js_tmp = json_object_get(js_data, "customer"))){
 
-	if((js_pub_date = json_object_get(js_data, "pub_date")) != NULL){
+		sd_data->s_customer = strdup(json_string_value(js_tmp));
+		if(DEBUG){
+			printf("\nCustomer: %s\n", sd_data->s_customer);
+		}
+	}
+	if((js_tmp = json_object_get(js_data, "pub_date"))){
 
 		if(DEBUG){
-			printf("\nPub_Date: %s\n", json_string_value(js_pub_date));
+			printf("\nPub_Date: %s\n", json_string_value(js_tmp));
 		}
 	}
 
-	if((js_sys_time = json_object_get(js_data, "sys_time")) != NULL){
+	if((js_tmp = json_object_get(js_data, "sys_time"))){
 
-		sd_data->u32_sys_timestamp = json_integer_value(js_sys_time);
+		sd_data->u32_sys_timestamp = json_integer_value(js_tmp);
 		if(DEBUG){
 			printf("\nSystem time: %d\n", sd_data->u32_sys_timestamp);
 		}
 
 	}
 
-	if((js_program = json_object_get(js_root, "PRGRM")) != NULL){
+	if((js_program = json_object_get(js_root, "PRGRM"))){
 
 		sd_data->s_program = strdup(json_string_value(js_program));
 
@@ -108,7 +110,7 @@ struct_data *s_data(const char *json){
 void free_struct_data(struct_data *sd_data){
 	uint8_t u8_counter = 0;
 
-	while((sd_data->s_search_keyword[u8_counter]) != NULL){
+	while((sd_data->s_search_keyword[u8_counter])){
 
 		free(sd_data->s_search_keyword[u8_counter]);
 		++u8_counter;
@@ -116,6 +118,7 @@ void free_struct_data(struct_data *sd_data){
 	}
 		free(sd_data->s_source);
 		free(sd_data->s_program);
+		free(sd_data->s_customer);
 
 	#if 0
 		free(sd_data->s_link);

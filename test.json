@@ -2,6 +2,7 @@
 {
     "data": {
         "source": "edition.cnn.com",
+	"customer": "stephan_company",
         "pub_date": "Sat, 06 Aug 2016 05:58:37 EDT",
         "sys_time": 1470478879,
         "result": [

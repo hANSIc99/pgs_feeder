@@ -26,8 +26,8 @@
 
 #include <stdint.h>
 #include <time.h>
-
 #define MAX_SEARCHKEYWORDS 10
+#include  <libpq-fe.h>
 
 #define true 1
 #define false 0
@@ -39,6 +39,7 @@ typedef struct s_data {
 	uint16_t u16_position;
 
 	char *s_source;
+	char *s_customer;
 	char *s_program;
 	char *s_link;
 
@@ -54,6 +55,15 @@ typedef struct s_data {
 } struct_data;
 /* struct_news = Name für Variablendeklaration: struct_news VarName */
 
+typedef struct s_dbinfo {
+
+PGconn *conn;
+
+char *s_tablename_data;
+char *s_tablename_keywords; 
+
+
+} struct_db_info;
 
 
 #endif
