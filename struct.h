@@ -43,13 +43,12 @@ typedef struct s_data {
 	char *s_program;
 	char *s_link;
 
-	uint32_t  u32_sys_timestamp;
+	uint32_t u32_sys_timestamp;
 
 	uint8_t u8_keywords_present;
 
 	char *s_search_keyword[MAX_SEARCHKEYWORDS];
 	uint16_t u16_matches[MAX_SEARCHKEYWORDS];
-
 
 	struct s_data *next;
 	struct s_data *previous;
@@ -59,13 +58,10 @@ typedef struct s_data {
 
 typedef struct s_dbinfo {
 
-PGconn *conn;
+	PGconn *conn;
 
-char *s_tablename_data;
-char *s_tablename_keywords; 
-
+	char *s_tablename_data;
 
 } struct_db_info;
-
 
 #endif

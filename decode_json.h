@@ -7,7 +7,6 @@
 #include <string.h>
 
 struct_data *s_data(const char *json);
-void free_struct_data(struct_data *sd_data);
-
+void free_struct_data(struct_data * sd_data);
 
 #endif

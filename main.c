@@ -16,7 +16,6 @@
  * =====================================================================================
  */
 
-
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -25,54 +24,28 @@
 #include "decode_json.h"
 #include "pgs_interface.h"
 
-int main(int argc, const char *argv[]) {
+int main(int argc, const char *argv[])
+{
 
-struct_data *sd_data;
+	struct_data *sd_data;
 
+	if (argc < 2) {
+		printf("\nError, expected JSON Object as argument.\n");
+		exit(1);
+	}
 
-if(argc < 2){
-	printf("\nError, expected JSON Object as argument.\n");
-	exit(1);
-}
+	printf("\n%s\n", *argv);
 
+	++argv;
+	printf("\n%s\n", *argv);
 
+	sd_data = s_data(*argv);
 
+	run_db(sd_data);
+	printf("\nprogram in struct %s\n", sd_data->s_program);
 
-printf("\n%s\n", *argv);
+	free_struct_data(sd_data);
 
-++argv;
-printf("\n%s\n", *argv);
-
-
-sd_data = s_data(*argv);
-
-run_db(sd_data);
-printf("\nprogram in struct %s\n", sd_data->s_program);
-
-
-free_struct_data(sd_data);
-
-
-
-
-return 0;
+	return 0;
 
 }
-
-
-
-
-#if 0
-iter = json_object_iter(js_root);
-while(iter){
-
-printf("\nRoot Object = %s\n", json_object_iter_key(iter));
-
-iter = json_object_iter_next(js_root, iter);
-
-}
-
-
-
-}
-#endif
