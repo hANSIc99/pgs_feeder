@@ -21,6 +21,7 @@ struct_data *s_data(const char *json){
 	for( ; u8_array_pos < MAX_SEARCHKEYWORDS ; ++u8_array_pos){
 		sd_data->s_search_keyword[u8_array_pos] = NULL;
 	}
+	u8_array_pos = 0;
 	js_root = json_loads(json,0, &error);
 	if(!js_root){
 
@@ -45,7 +46,6 @@ struct_data *s_data(const char *json){
 
 
 	while((js_result_obj = json_array_get(js_result, u8_array_pos))){
-
 		/* writing the keyword in struct */
 
 		js_array_obj = json_object_get(js_result_obj, "s_keyword");	
@@ -56,13 +56,16 @@ struct_data *s_data(const char *json){
 		js_array_obj = json_object_get(js_result_obj, "u16_result");
 
 		sd_data->u16_matches[u8_array_pos] = json_integer_value(js_array_obj);
-		if(DEBUG){
+		if(1){
 			printf("\nobject keyword %s value: %d\n", sd_data->s_search_keyword[u8_array_pos], sd_data->u16_matches[u8_array_pos]);
 		}
 		++u8_array_pos;
 
 	} 
 
+	/* indicates how many keywords are available, necessary to build the table */
+
+	sd_data->u8_keywords_present = u8_array_pos;
 
 	if((js_tmp = json_object_get(js_data, "source"))){
 

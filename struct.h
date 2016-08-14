@@ -45,6 +45,8 @@ typedef struct s_data {
 
 	uint32_t  u32_sys_timestamp;
 
+	uint8_t u8_keywords_present;
+
 	char *s_search_keyword[MAX_SEARCHKEYWORDS];
 	uint16_t u16_matches[MAX_SEARCHKEYWORDS];
 
