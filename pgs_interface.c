@@ -65,17 +65,18 @@ static void exit_nicely(PGconn *conn){
 struct_db_info *check_create_table(struct_data *sd_data, struct_db_info *db_data){
 
 	const char *s_create_table_1 = "CREATE TABLE ";
-	const char *s_create_table_2 = "(";
-	const char *s_create_table_3 = ");";
+	const char *s_create_table_2 = " ( ";
+	const char *s_create_table_3 = " ); ";
 	const char *s_create_table_8 = "(	"
-		"ID INT PRIMARY KEY NOT NULL,"
+		"ID INT PRIMARY KEY NOT NULL, "
 		"NAME TEXT NOT NULL,"	
 		"AGE INT NOT NULL,"	
 		"ADDRESS CHAR(50),"		
 		"SALARY REAL"			
 		");";
-	/* the keyword stands before CHAR(50) */
-	const char *s_create_table_key_col = " CHAR(50)" ;
+	/* the keyword stands before SMALLINT */
+	/* the data type for the result can be changed here */
+	const char *s_create_table_key_col = " SMALLINT NULL" ;
 
 #if  0     /* ----- #if 0 : If0Label_1 ----- */
 	const char *s_create_k_table_1 = "CREATE TABLE ";
@@ -90,7 +91,7 @@ struct_db_info *check_create_table(struct_data *sd_data, struct_db_info *db_data
 
 	char *s_ptr, *s_tmp_ptr, *s_sql_cmd, *s_table_column;
 	uint16_t u16_sql_lenght, u16_column_lenght;
-	uint8_t u8_count, u8_testflag;
+	uint8_t u8_count; 
 	PGresult *exec;
 
 /* remove dots from source string */
@@ -160,12 +161,13 @@ struct_db_info *check_create_table(struct_data *sd_data, struct_db_info *db_data
 	
 		for(u8_count = 0 ; u8_count < sd_data->u8_keywords_present; ++u8_count){
 			/* add for every keyword stringlenght + SQL extension to the lenght */
-			u16_sql_lenght += strlen(sd_data->s_search_keyword[u8_count]) + strlen(s_create_table_key_col);
+			/* +1 for the leading '_' */
+			u16_sql_lenght += strlen(sd_data->s_search_keyword[u8_count]) + strlen(s_create_table_key_col) +1;
 			
 			printf("\nKeyword available! \n");	
 		} 
 		/* add necessary amount of ',' to the lenght */	
-		printf("\nAmount of commas: %d\n", u8_count);
+		
 		u16_sql_lenght += (--u8_count);
 		
 		/* add the lenght of ending to the lenght */
@@ -177,6 +179,8 @@ struct_db_info *check_create_table(struct_data *sd_data, struct_db_info *db_data
 		s_sql_cmd = malloc((sizeof(char)) * u16_sql_lenght);
 
 #if 1
+		/* creating the string for one column */
+		
 		strcpy(s_sql_cmd, s_create_table_1);
 		strcat(s_sql_cmd, db_data->s_tablename_data);
 		strcat(s_sql_cmd, s_create_table_2); 
@@ -184,24 +188,41 @@ struct_db_info *check_create_table(struct_data *sd_data, struct_db_info *db_data
 		if(1){
 		printf("\nSQL COMMAND: \n%s\n", s_sql_cmd );
 		}
+
+
 		for(u8_count = 0 ; u8_count < sd_data->u8_keywords_present; ++u8_count){
 			/* add add keyword columns to the table */
 		u16_column_lenght = 0;
-		u16_column_lenght = strlen(sd_data->s_search_keyword[u8_count]);
+		/* +1 for the leading '_' */
+		u16_column_lenght = strlen(sd_data->s_search_keyword[u8_count]) +1;
 		u16_column_lenght += strlen(s_create_table_key_col);
-
 
 
 		(u8_count < sd_data->u8_keywords_present-1) ? u16_column_lenght += 1 : u16_column_lenght  ; 	
 
-		/* construction site */
+		s_table_column = malloc(sizeof(char) * u16_column_lenght );
+		/* add the leading '_' */
+		strcpy(s_table_column, "_");
+		strcat(s_table_column, sd_data->s_search_keyword[u8_count]);
+		strcat(s_table_column, s_create_table_key_col);
 		
-		s_table_column = malloc(sizeof(char) * u16_column_lenght );	
-
+		(u8_count < sd_data->u8_keywords_present-1) ? strcat(s_table_column, ",") : strcat(s_table_column,"")  ;
+ 	
+		/* add the column command to the SQL command */
+		
+		strcat(s_sql_cmd, s_table_column);
+		printf("\nCOLUMN FOR SQL:\n\t %s \n", s_table_column);	
+		free(s_table_column);
 						
-			printf("\nKeyword Number %d! \n", u8_count);	
 		} 
 
+		/* add the end to the SQL command */
+
+		strcat(s_sql_cmd, s_create_table_3);
+
+		/* execute SQL command */
+
+		printf("\nSQL COMMAND: \n%s\n", s_sql_cmd );
 		exec = PQexec(db_data->conn, s_sql_cmd);
 
 		free(s_sql_cmd);
@@ -221,75 +242,6 @@ struct_db_info *check_create_table(struct_data *sd_data, struct_db_info *db_data
 #endif
 	}
 
-#if 0
-	/* KEYWORD TABLE */
-	/* +3 byte for the leading and the middel '_' & for the '\0' */
-	/* +2 byte for the later keyword version += "_k" */
-	
-	db_data->s_tablename_keywords = malloc(((strlen(sd_data->s_customer)) * sizeof(char)) +1);
-	strcpy(db_data->s_tablename_keywords, sd_data->s_customer);
-	
-	
-	printf("\nNew keyword table name: %s\n", db_data->s_tablename_keywords);	
-
-
-
-
-
-
-
-	u16_sql_lenght = strlen(CHECK_TABLE_1) + strlen(CHECK_TABLE_2) + strlen(db_data->s_tablename_keywords) +1;
-	s_sql_cmd = malloc((sizeof(char)) * u16_sql_lenght);
-
-	strcpy(s_sql_cmd, CHECK_TABLE_1);
-	strcat(s_sql_cmd, db_data->s_tablename_keywords);
-	strcat(s_sql_cmd, CHECK_TABLE_2);
-	printf("\nSQL command before execution: \n%s\n\n", s_sql_cmd);
-	exec = PQexec(db_data->conn, s_sql_cmd );
-
-	free(s_sql_cmd);
-	if(PQntuples(exec)){
-		printf("\nTable excist: %d\n", PQntuples(exec));
-		PQclear(exec);
-	} else {
-		/* create table for the keywords */
-		/* construction site */
-
-
-		for(u8_count = 0 ; u8_count < sd_data->u8_keywords_present; ++u8_count){
-
-			printf("\nKeyword available! \n");	
-		} 
-			u16_sql_lenght = strlen(s_create_table_1)+strlen(s_create_table_2)+strlen(db_data->s_tablename_keywords) +1;
-
-
-		s_sql_cmd = malloc((sizeof(char)) * u16_sql_lenght);
-
-		strcpy(s_sql_cmd, s_create_table_1);
-		strcat(s_sql_cmd, db_data->s_tablename_keywords);
-		strcat(s_sql_cmd, s_create_table_2); 
-		if(DEBUG){
-		printf("\nSQL COMMAND KEYWORD: \n%s\n", s_sql_cmd );
-		}
-
-		exec = PQexec(db_data->conn, s_sql_cmd);
-
-		free(s_sql_cmd);
-
-		/* test if the SQL command was succesful */
-		if((PQresultStatus(exec)) != PGRES_COMMAND_OK){
-
-			printf("\nERROR: Couldnt create keyword table: %s\n%s\n", PQresStatus(PQresultStatus(exec)),PQresultErrorMessage(exec));
-			/* log error message here */
-		} else {
-			if(DEBUG){
-			printf("\nTable created!\n");
-			}
-		}
-
-		PQclear(exec);
-	}
-#endif
 
 
 return db_data;
