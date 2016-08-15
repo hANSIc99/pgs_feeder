@@ -61,6 +61,8 @@ typedef struct s_dbinfo {
 	PGconn *conn;
 
 	char *s_tablename_data;
+	char *s_column_names[MAX_SEARCHKEYWORDS];
+	
 
 } struct_db_info;
 

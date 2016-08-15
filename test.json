@@ -8,15 +8,15 @@
         "result": [
             {
                 "s_keyword": "to",
-                "u16_result": 29
+                "u16_result": 79
             },
 	    {
 		"s_keyword": "test",
-		"u16_result": 10
+		"u16_result": 12
 	    },
 	    {
 		"s_keyword": "bla",
-		"u16_result": 25
+		"u16_result": 5
 	    }
         ]
     },

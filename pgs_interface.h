@@ -12,8 +12,8 @@
 
 uint8_t run_db(struct_data * sd_data);
 PGconn *connect_db();
-struct_db_info *check_create_table(struct_data * sd_data,
-				   struct_db_info * db_data);
+struct_db_info *check_create_table(struct_data * sd_data, struct_db_info * db_data);
 void free_dbinfo(struct_db_info * db_info);
+uint8_t write_data(struct_db_info *db_data, struct_data *sd_data);
 
 #endif

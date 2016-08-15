@@ -29,6 +29,7 @@ int main(int argc, const char *argv[])
 
 	struct_data *sd_data;
 
+
 	if (argc < 2) {
 		printf("\nError, expected JSON Object as argument.\n");
 		exit(1);

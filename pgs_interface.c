@@ -10,16 +10,27 @@ static void exit_nicely(PGconn * conn);
 
 uint8_t run_db(struct_data * sd_data)
 {
-
 	struct_db_info *s_db_info;
-
+	uint8_t u8_count = 0;
 	s_db_info = malloc(sizeof(struct_db_info));
 
+	/* initialisation of the struct_db_info */
+
+	for( ; u8_count < MAX_SEARCHKEYWORDS; u8_count++){
+
+		s_db_info->s_column_names[u8_count] = NULL;
+
+	}
 	/* establish a connection to a database */
 
 	s_db_info->conn = connect_db();
 	/* error checking has to be implemented */
 	s_db_info = check_create_table(sd_data, s_db_info);
+
+
+	if(!write_data(s_db_info, sd_data)){
+	/* log error here */
+	}
 
 	free_dbinfo(s_db_info);
 
@@ -70,8 +81,9 @@ struct_db_info *check_create_table(struct_data * sd_data,
 	/* the keyword stands before SMALLINT */
 	/* the data type for the result can be changed here */
 	const char *s_create_table_key_col = " SMALLINT NULL, ";
-	const char *s_create_table_timestamp =
-	    " _timestamp TIMESTAMP [0] PRIMARY KEY ";
+	const char *s_create_table_timestamp_1 =
+	    " _timestamp";
+	const char *s_create_table_timestamp_2 = " TIMESTAMP [0] PRIMARY KEY" ;
 
 #if  0				/* ----- #if 0 : If0Label_1 ----- */
 	const char *s_create_k_table_1 = "CREATE TABLE ";
@@ -89,15 +101,13 @@ struct_db_info *check_create_table(struct_data * sd_data,
 	uint8_t u8_count;
 	PGresult *exec;
 
-/* remove dots from source string */
+	/* remove dots from source string */
 	/* +3 byte for the leading and the middel '_' & for the '\0' */
-	/* +2 byte for the later keyword version += "_k" */
 
 	db_data->s_tablename_data =
 	    malloc(((strlen(sd_data->s_source) +
 		     strlen(sd_data->s_customer)) * sizeof(char)) + 3);
 
-#if 1
 	db_data->s_tablename_data[0] = '_';
 	strcpy((db_data->s_tablename_data) + 1, sd_data->s_customer);
 	strcat(db_data->s_tablename_data, "_");
@@ -113,7 +123,6 @@ struct_db_info *check_create_table(struct_data * sd_data,
 		printf("\n dot found\n");
 
 	}
-#endif
 	printf("\nNew table name: %s\n", db_data->s_tablename_data);
 
 	/* DATA TABLE */
@@ -142,13 +151,26 @@ struct_db_info *check_create_table(struct_data * sd_data,
 	if (PQntuples(exec)) {
 		printf("\nTable excist: %d\n", PQntuples(exec));
 		PQclear(exec);
+
+		for(u8_count = 0; u8_count < sd_data->u8_keywords_present; ++u8_count){
+		u16_column_lenght = strlen(sd_data->s_search_keyword[u8_count]) + 2;
+		s_table_column = malloc(u16_column_lenght);
+		s_table_column[0] = '_' ;
+		strcpy(s_table_column, sd_data->s_search_keyword[u8_count]);
+		db_data->s_column_names[u8_count] = strdup(s_table_column);
+		free(s_table_column);	
+		}
+		db_data->s_column_names[u8_count] = strdup(s_create_table_timestamp_1);
+
+
 	} else {
 		/* create table for the data */
 
 		u16_sql_lenght = strlen(s_create_table_1) + 1;
 		u16_sql_lenght += strlen(db_data->s_tablename_data);
 		u16_sql_lenght += strlen(s_create_table_2);
-		u16_sql_lenght += strlen(s_create_table_timestamp);
+		u16_sql_lenght += strlen(s_create_table_timestamp_1);
+		u16_sql_lenght += strlen(s_create_table_timestamp_2);
 
 		/* begin of the lenght of the columns */
 
@@ -162,9 +184,6 @@ struct_db_info *check_create_table(struct_data * sd_data,
 
 			printf("\nKeyword available! \n");
 		}
-		/* add necessary amount of ',' to the lenght */
-
-		u16_sql_lenght += (--u8_count);
 
 		/* add the lenght of ending to the lenght */
 		u16_sql_lenght += strlen(s_create_table_3);
@@ -173,7 +192,6 @@ struct_db_info *check_create_table(struct_data * sd_data,
 
 		s_sql_cmd = malloc((sizeof(char)) * u16_sql_lenght);
 
-#if 1
 		/* creating the string for one column */
 
 		strcpy(s_sql_cmd, s_create_table_1);
@@ -198,22 +216,34 @@ struct_db_info *check_create_table(struct_data * sd_data,
 			s_table_column =
 			    malloc(sizeof(char) * u16_column_lenght);
 			/* add the leading '_' */
-			strcpy(s_table_column, "_");
-			strcat(s_table_column,
+
+			s_table_column[0] = '_' ;
+			strcpy(s_table_column+1,
 			       sd_data->s_search_keyword[u8_count]);
+
+			/* add the column-name to the struct_db_info */
+			db_data->s_column_names[u8_count] = strdup(s_table_column); 
+
 			strcat(s_table_column, s_create_table_key_col);
 
 			/* add the column command to the SQL command */
 
 			strcat(s_sql_cmd, s_table_column);
 			printf("\nCOLUMN FOR SQL:\n\t %s \n", s_table_column);
+
+
 			free(s_table_column);
 
 		}
 		/* add the timestamp-column to the table */
 
-		strcat(s_sql_cmd, s_create_table_timestamp);
-
+		strcat(s_sql_cmd, s_create_table_timestamp_1);
+		strcat(s_sql_cmd, s_create_table_timestamp_2);
+	
+		/* add the timestamp to the column names in struct_db_info */
+		printf("\nu8 count ist hier %d\n", u8_count);
+		db_data->s_column_names[u8_count] = strdup(s_create_table_timestamp_1);
+		
 		/* add the end to the SQL command */
 
 		strcat(s_sql_cmd, s_create_table_3);
@@ -239,7 +269,6 @@ struct_db_info *check_create_table(struct_data * sd_data,
 		}
 
 		PQclear(exec);
-#endif
 	}
 
 	return db_data;
@@ -247,9 +276,83 @@ struct_db_info *check_create_table(struct_data * sd_data,
 
 void free_dbinfo(struct_db_info * db_info)
 {
+	uint8_t u8_count = 0;
 
-	free(db_info->s_tablename_data);
+	free((db_info->s_tablename_data));
+
+
+	while((db_info->s_column_names[u8_count])){
+		free(db_info->s_column_names[u8_count]);
+	    	u8_count++;
+	}
+
+
 	exit_nicely(db_info->conn);
 	free(db_info);
 
 }
+uint8_t write_data(struct_db_info *db_data, struct_data *sd_data){
+
+const char *s_sql_1 = "INSERT INTO ";
+const char *s_sql_2 = "( ";
+const char *s_sql_3 = " )" ;
+const char *s_sql_4 = " VALUES (";
+const char *s_sql_5 = " ); " ;
+
+char *s_sql_cmd, *s_tmp_value;
+
+uint16_t u16_sql_lenght, u16_tmp_value;
+uint8_t u8_count = 0;
+uint8_t u8_commas = 0;
+
+u16_sql_lenght = strlen(s_sql_1);
+u16_sql_lenght += strlen(db_data->s_tablename_data);
+u16_sql_lenght += strlen(s_sql_2);
+
+while((db_data->s_column_names[u8_count])){
+/* add space for the column names */
+u16_sql_lenght += strlen(db_data->s_column_names[u8_count]) +1;
+/* add space for the values */
+u16_sql_lenght += 3 ;
+u8_count++;
+}
+/* add space for the commas */
+u16_sql_lenght += --u8_count;
+u8_commas = u8_count;
+u8_count = 0;
+u16_sql_lenght += strlen(s_sql_3); 
+ 
+s_sql_cmd = malloc(u16_sql_lenght * sizeof(char));
+
+strcpy(s_sql_cmd, s_sql_1);
+strcat(s_sql_cmd,db_data->s_tablename_data);
+strcat(s_sql_cmd, s_sql_2);
+
+while((db_data->s_column_names[u8_count])){
+strcat(s_sql_cmd, db_data->s_column_names[u8_count]);
+if(u8_count < u8_commas){
+strcat(s_sql_cmd, ",");
+}
+
+u8_count++;
+}
+
+strcat(s_sql_cmd, s_sql_3);
+
+u8_count = 0;
+while((sd_data->u16_matches[u8_count])){
+s_tmp_value = malloc(4 * sizeof(char));
+printf("\ndurchlauf nummer: %d \n", u8_count);
+
+snprintf(s_tmp_value, 4, "%d", sd_data->u16_matches[u8_count]);
+printf("\n result: %s\n", s_tmp_value);
+/* construction site */
+free(s_tmp_value);
+u8_count++;
+}
+
+printf("\nSPL command: %s\n", s_sql_cmd);
+
+return 0;
+}
+
