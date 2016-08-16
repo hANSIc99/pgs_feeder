@@ -29,7 +29,7 @@ uint8_t run_db(struct_data * sd_data)
 
 
 	if(!write_data(s_db_info, sd_data)){
-	/* log error here */
+		/* log error here */
 	}
 
 	free_dbinfo(s_db_info);
@@ -41,7 +41,7 @@ PGconn *connect_db()
 {
 
 	char *conninfo =
-	    "host=localhost port=5432 dbname=mydb user=stephan password=rakete connect_timeout=10";
+		"host=localhost port=5432 dbname=mydb user=stephan password=rakete connect_timeout=10";
 	PGconn *conn;
 
 	conn = PQconnectdb(conninfo);
@@ -67,37 +67,23 @@ static void exit_nicely(PGconn * conn)
 }
 
 struct_db_info *check_create_table(struct_data * sd_data,
-				   struct_db_info * db_data)
+		struct_db_info * db_data)
 {
 
 	const char *s_create_table_1 = "CREATE TABLE ";
 	const char *s_create_table_2 = " ( ";
 	const char *s_create_table_3 = " ); ";
 
-	const char *s_create_table_8 = "(	"
-	    "ID INT PRIMARY KEY NOT NULL, "
-	    "NAME TEXT NOT NULL,"
-	    "AGE INT NOT NULL," "ADDRESS CHAR(50)," "SALARY REAL" ");";
+
 	/* the keyword stands before SMALLINT */
 	/* the data type for the result can be changed here */
 	const char *s_create_table_key_col = " SMALLINT NULL, ";
 	const char *s_create_table_timestamp_1 =
-	    " _timestamp";
-	const char *s_create_table_timestamp_2 = " TIMESTAMP [0] PRIMARY KEY" ;
-
-#if  0				/* ----- #if 0 : If0Label_1 ----- */
-	const char *s_create_k_table_1 = "CREATE TABLE ";
-	/* table name */
-	const char *s_create_k_table_2 = "(";
-	/* data types */
-	const char *s_create_k_table_3 = ",";
-	/* last data type */
-	const char *s_create_k_table_4 = ");";
-	const char *s_create_k_datatype = " ";
-#endif				/* ----- #if 0 : If0Label_1 ----- */
+		" _timestamp";
+	const char *s_create_table_timestamp_2 = " TIMESTAMPTZ PRIMARY KEY" ;
 
 	char *s_ptr, *s_tmp_ptr, *s_sql_cmd, *s_table_column;
-	uint16_t u16_sql_lenght, u16_column_lenght;
+	uint16_t u16_column_lenght;
 	uint8_t u8_count;
 	PGresult *exec;
 
@@ -105,8 +91,8 @@ struct_db_info *check_create_table(struct_data * sd_data,
 	/* +3 byte for the leading and the middel '_' & for the '\0' */
 
 	db_data->s_tablename_data =
-	    malloc(((strlen(sd_data->s_source) +
-		     strlen(sd_data->s_customer)) * sizeof(char)) + 3);
+		malloc(((strlen(sd_data->s_source) +
+						strlen(sd_data->s_customer)) * sizeof(char)) + 3);
 
 	db_data->s_tablename_data[0] = '_';
 	strcpy((db_data->s_tablename_data) + 1, sd_data->s_customer);
@@ -128,10 +114,8 @@ struct_db_info *check_create_table(struct_data * sd_data,
 	/* DATA TABLE */
 	/* check is the data table excist */
 
-	u16_sql_lenght =
-	    strlen(CHECK_TABLE_1) + strlen(CHECK_TABLE_2) +
-	    strlen(db_data->s_tablename_data) + 1;
-	s_sql_cmd = malloc((sizeof(char)) * u16_sql_lenght);
+
+	s_sql_cmd = malloc((sizeof(char)) * MAX_SQL_LENGHT);
 
 	strcpy(s_sql_cmd, CHECK_TABLE_1);
 	strcat(s_sql_cmd, db_data->s_tablename_data);
@@ -144,7 +128,7 @@ struct_db_info *check_create_table(struct_data * sd_data,
 	if (DEBUG) {
 		printf("\ntest source = %s\n", sd_data->s_source);
 		printf("\npg_status as string: %s\n",
-		       PQresStatus(PQresultStatus(exec)));
+				PQresStatus(PQresultStatus(exec)));
 	}
 
 	/* if PQntubles returns a 1 (for 1 table), the table doenst have to be created */
@@ -153,12 +137,12 @@ struct_db_info *check_create_table(struct_data * sd_data,
 		PQclear(exec);
 
 		for(u8_count = 0; u8_count < sd_data->u8_keywords_present; ++u8_count){
-		u16_column_lenght = strlen(sd_data->s_search_keyword[u8_count]) + 2;
-		s_table_column = malloc(u16_column_lenght);
-		s_table_column[0] = '_' ;
-		strcpy(s_table_column, sd_data->s_search_keyword[u8_count]);
-		db_data->s_column_names[u8_count] = strdup(s_table_column);
-		free(s_table_column);	
+			u16_column_lenght = strlen(sd_data->s_search_keyword[u8_count]) + 2;
+			s_table_column = malloc(u16_column_lenght);
+			s_table_column[0] = '_' ;
+			strcpy(s_table_column+1, sd_data->s_search_keyword[u8_count]);
+			db_data->s_column_names[u8_count] = strdup(s_table_column);
+			free(s_table_column);	
 		}
 		db_data->s_column_names[u8_count] = strdup(s_create_table_timestamp_1);
 
@@ -166,31 +150,8 @@ struct_db_info *check_create_table(struct_data * sd_data,
 	} else {
 		/* create table for the data */
 
-		u16_sql_lenght = strlen(s_create_table_1) + 1;
-		u16_sql_lenght += strlen(db_data->s_tablename_data);
-		u16_sql_lenght += strlen(s_create_table_2);
-		u16_sql_lenght += strlen(s_create_table_timestamp_1);
-		u16_sql_lenght += strlen(s_create_table_timestamp_2);
 
-		/* begin of the lenght of the columns */
-
-		for (u8_count = 0; u8_count < sd_data->u8_keywords_present;
-		     ++u8_count) {
-			/* add for every keyword stringlenght + SQL extension to the lenght */
-			/* +1 for the leading '_' */
-			u16_sql_lenght +=
-			    strlen(sd_data->s_search_keyword[u8_count]) +
-			    strlen(s_create_table_key_col) + 1;
-
-			printf("\nKeyword available! \n");
-		}
-
-		/* add the lenght of ending to the lenght */
-		u16_sql_lenght += strlen(s_create_table_3);
-
-		printf("\nOverall lenght: %d\n", u16_sql_lenght);
-
-		s_sql_cmd = malloc((sizeof(char)) * u16_sql_lenght);
+		s_sql_cmd = malloc((sizeof(char)) * MAX_SQL_LENGHT);
 
 		/* creating the string for one column */
 
@@ -203,23 +164,23 @@ struct_db_info *check_create_table(struct_data * sd_data,
 		}
 
 		for (u8_count = 0; u8_count < sd_data->u8_keywords_present;
-		     ++u8_count) {
+				++u8_count) {
 			/* add add keyword columns to the table */
 			u16_column_lenght = 0;
 			/* +1 for the leading '_' */
 
 			u16_column_lenght =
-			    strlen(sd_data->s_search_keyword[u8_count]) + 1;
+				strlen(sd_data->s_search_keyword[u8_count]) + 1;
 
 			u16_column_lenght += strlen(s_create_table_key_col);
 
 			s_table_column =
-			    malloc(sizeof(char) * u16_column_lenght);
+				malloc(sizeof(char) * u16_column_lenght);
 			/* add the leading '_' */
 
 			s_table_column[0] = '_' ;
 			strcpy(s_table_column+1,
-			       sd_data->s_search_keyword[u8_count]);
+					sd_data->s_search_keyword[u8_count]);
 
 			/* add the column-name to the struct_db_info */
 			db_data->s_column_names[u8_count] = strdup(s_table_column); 
@@ -239,11 +200,11 @@ struct_db_info *check_create_table(struct_data * sd_data,
 
 		strcat(s_sql_cmd, s_create_table_timestamp_1);
 		strcat(s_sql_cmd, s_create_table_timestamp_2);
-	
+
 		/* add the timestamp to the column names in struct_db_info */
 		printf("\nu8 count ist hier %d\n", u8_count);
 		db_data->s_column_names[u8_count] = strdup(s_create_table_timestamp_1);
-		
+
 		/* add the end to the SQL command */
 
 		strcat(s_sql_cmd, s_create_table_3);
@@ -259,8 +220,8 @@ struct_db_info *check_create_table(struct_data * sd_data,
 		if ((PQresultStatus(exec)) != PGRES_COMMAND_OK) {
 
 			printf("\nERROR: Couldnt create table: %s\n%s\n",
-			       PQresStatus(PQresultStatus(exec)),
-			       PQresultErrorMessage(exec));
+					PQresStatus(PQresultStatus(exec)),
+					PQresultErrorMessage(exec));
 			/* log error message here */
 		} else {
 			if (DEBUG) {
@@ -283,7 +244,7 @@ void free_dbinfo(struct_db_info * db_info)
 
 	while((db_info->s_column_names[u8_count])){
 		free(db_info->s_column_names[u8_count]);
-	    	u8_count++;
+		u8_count++;
 	}
 
 
@@ -293,66 +254,76 @@ void free_dbinfo(struct_db_info * db_info)
 }
 uint8_t write_data(struct_db_info *db_data, struct_data *sd_data){
 
-const char *s_sql_1 = "INSERT INTO ";
-const char *s_sql_2 = "( ";
-const char *s_sql_3 = " )" ;
-const char *s_sql_4 = " VALUES (";
-const char *s_sql_5 = " ); " ;
+	const char *s_sql_1 = "INSERT INTO ";
+	const char *s_sql_2 = "( ";
+	const char *s_sql_3 = " ) VALUES (" ;
+	const char *s_sql_4 = " to_timestamp('";
+	const char *s_sql_5 = "')); " ;
 
-char *s_sql_cmd, *s_tmp_value;
+	PGresult *exec;
+	char *s_sql_cmd, *s_tmp_value;
 
-uint16_t u16_sql_lenght, u16_tmp_value;
-uint8_t u8_count = 0;
-uint8_t u8_commas = 0;
+	uint8_t u8_count = 0;
 
-u16_sql_lenght = strlen(s_sql_1);
-u16_sql_lenght += strlen(db_data->s_tablename_data);
-u16_sql_lenght += strlen(s_sql_2);
 
-while((db_data->s_column_names[u8_count])){
-/* add space for the column names */
-u16_sql_lenght += strlen(db_data->s_column_names[u8_count]) +1;
-/* add space for the values */
-u16_sql_lenght += 3 ;
-u8_count++;
-}
-/* add space for the commas */
-u16_sql_lenght += --u8_count;
-u8_commas = u8_count;
-u8_count = 0;
-u16_sql_lenght += strlen(s_sql_3); 
+
+	s_sql_cmd = malloc(MAX_SQL_LENGHT * sizeof(char));
+
+	strcpy(s_sql_cmd, s_sql_1);
+	strcat(s_sql_cmd,db_data->s_tablename_data);
+	strcat(s_sql_cmd, s_sql_2);
+
+	while((db_data->s_column_names[u8_count])){
+		
+		strcat(s_sql_cmd, db_data->s_column_names[u8_count]);
+		if(u8_count < sd_data->u8_keywords_present){
+			strcat(s_sql_cmd, ",");
+		}
+		u8_count++;
+	}
+
+	strcat(s_sql_cmd, s_sql_3);
+
+	u8_count = 0;
+	while((sd_data->u16_matches[u8_count])){
+		s_tmp_value = malloc(4 * sizeof(char));
+
+		snprintf(s_tmp_value, 4, "%d,", sd_data->u16_matches[u8_count]);
+		printf("\n result: %s\n", s_tmp_value);
+
+		strcat(s_sql_cmd, s_tmp_value);
+				
+
+		free(s_tmp_value);
+		u8_count++;
+	}
+     	strcat(s_sql_cmd, s_sql_4);
+	
+	/* cast the timestamp to a string */
  
-s_sql_cmd = malloc(u16_sql_lenght * sizeof(char));
+	s_tmp_value = malloc(sizeof(char) * (NUMBER_CHARS_TIMESTAMP+1));	
+	snprintf(s_tmp_value, NUMBER_CHARS_TIMESTAMP+1, "%d", sd_data->u32_sys_timestamp);
+	strcat(s_sql_cmd, s_tmp_value);
+	free(s_tmp_value);
+	/* add the end to the SQL command */
+	strcat(s_sql_cmd, s_sql_5);
+	
+	printf("\nSPL command: %s\n\n", s_sql_cmd);
+	/* execute SQL command */
+	exec = PQexec(db_data->conn, s_sql_cmd);
+		/* test if the SQL command was succesful */
+		if ((PQresultStatus(exec)) != PGRES_COMMAND_OK) {
 
-strcpy(s_sql_cmd, s_sql_1);
-strcat(s_sql_cmd,db_data->s_tablename_data);
-strcat(s_sql_cmd, s_sql_2);
-
-while((db_data->s_column_names[u8_count])){
-strcat(s_sql_cmd, db_data->s_column_names[u8_count]);
-if(u8_count < u8_commas){
-strcat(s_sql_cmd, ",");
-}
-
-u8_count++;
-}
-
-strcat(s_sql_cmd, s_sql_3);
-
-u8_count = 0;
-while((sd_data->u16_matches[u8_count])){
-s_tmp_value = malloc(4 * sizeof(char));
-printf("\ndurchlauf nummer: %d \n", u8_count);
-
-snprintf(s_tmp_value, 4, "%d", sd_data->u16_matches[u8_count]);
-printf("\n result: %s\n", s_tmp_value);
-/* construction site */
-free(s_tmp_value);
-u8_count++;
-}
-
-printf("\nSPL command: %s\n", s_sql_cmd);
-
-return 0;
+			printf("\nERROR: Couldnt insert data: %s\n%s\n",
+					PQresStatus(PQresultStatus(exec)),
+					PQresultErrorMessage(exec));
+			/* log error message here */
+		} else {
+			if (DEBUG) {
+				printf("\ndata inserted!\n");
+			}
+		}
+	free(s_sql_cmd);
+       	return 0;
 }
 

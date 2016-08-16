@@ -27,6 +27,7 @@
 #include <stdint.h>
 #include <time.h>
 #define MAX_SEARCHKEYWORDS 10
+#define NUMBER_CHARS_TIMESTAMP 10
 #include  <libpq-fe.h>
 
 #define true 1

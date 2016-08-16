@@ -19,9 +19,8 @@ struct_data *s_data(const char *json)
 	js_result_obj = NULL;
 	js_array_obj = NULL;
 
-	for (; u8_array_pos < MAX_SEARCHKEYWORDS; ++u8_array_pos) {
-		sd_data->s_search_keyword[u8_array_pos] = NULL;
-	}
+	sd_data = s_data_init(sd_data);
+
 	u8_array_pos = 0;
 	js_root = json_loads(json, 0, &error);
 	if (!js_root) {
@@ -130,5 +129,28 @@ void free_struct_data(struct_data * sd_data)
 	free(sd_data->s_link);
 #endif
 	free(sd_data);
+
+}
+
+
+
+struct_data *s_data_init(struct_data *sd_data){
+
+uint8_t u8_count;
+
+sd_data->u16_position = 0;
+sd_data->s_source = NULL;
+sd_data->s_customer = NULL;
+sd_data->s_program = NULL;
+sd_data->s_link = NULL;
+sd_data->u32_sys_timestamp = 0;
+sd_data->u8_keywords_present = 0;
+
+
+for(u8_count = 0; u8_count < MAX_SEARCHKEYWORDS; u8_count++){
+sd_data->s_search_keyword[u8_count] = NULL;
+sd_data->u16_matches[u8_count] = 0;
+}
+return sd_data;
 
 }

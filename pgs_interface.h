@@ -10,6 +10,9 @@
 #include "struct.h"
 #include "debug.h"
 
+#define MAX_SQL_LENGHT 2000
+
+
 uint8_t run_db(struct_data * sd_data);
 PGconn *connect_db();
 struct_db_info *check_create_table(struct_data * sd_data, struct_db_info * db_data);
