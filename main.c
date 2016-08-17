@@ -24,21 +24,31 @@
 #include "decode_json.h"
 #include "pgs_interface.h"
 
+#define MAX_JS_LINE_LENGHT 300
+
 int main(int argc, const char *argv[])
 {
 
 	struct_data *sd_data;
+	char *s_json;
+	char s_buffer[MAX_JS_LINE_LENGHT];
 
+	s_json = calloc(1,1);
 
-	if (argc < 2) {
-		printf("\nError, expected JSON Object as argument.\n");
-		exit(1);
+	fflush(stdin);
+
+	while(fgets(s_buffer, MAX_JS_LINE_LENGHT, stdin)){
+	s_json = realloc( s_json, ((strlen(s_json) + strlen(s_buffer) * sizeof(char)) + 1));
+	if(!s_json){
+	/* log error here */
 	}
+	strcat(s_json, s_buffer);
+	}	
+	printf("\n strlen: %d\n", strlen(s_json));	
 
-	printf("\n%s\n", *argv);
+	printf("\nFILE: %s\n", s_json);
 
-	++argv;
-	printf("\n%s\n", *argv);
+
 
 	sd_data = s_data(*argv);
 

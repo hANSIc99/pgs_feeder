@@ -1,3 +1,3 @@
 #!/bin/bash
 value=$(<test.json)
-./pgs_feeder "$value"
+echo "value" | ./pgs_feeder
