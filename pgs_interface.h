@@ -10,7 +10,8 @@
 #include "struct.h"
 #include "debug.h"
 
-#define MAX_SQL_LENGHT 2000
+#define MAX_SQL_LENGHT 5000
+#define MAX_SQL_COLUMN 500
 
 
 uint8_t run_db(struct_data * sd_data);

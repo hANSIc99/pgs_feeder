@@ -170,7 +170,7 @@ struct_db_info *check_create_table(struct_data * sd_data,
 			/* +1 for the leading '_' */
 
 			u16_column_lenght =
-				strlen(sd_data->s_search_keyword[u8_count]) + 1;
+				strlen(sd_data->s_search_keyword[u8_count]) + 2;
 
 			u16_column_lenght += strlen(s_create_table_key_col);
 
@@ -283,19 +283,22 @@ uint8_t write_data(struct_db_info *db_data, struct_data *sd_data){
 	}
 
 	strcat(s_sql_cmd, s_sql_3);
-
-	u8_count = 0;
-	while((sd_data->u16_matches[u8_count])){
+for(u8_count = 0; u8_count < sd_data->u8_keywords_present; u8_count++){
+		s_tmp_value = NULL;
 		s_tmp_value = malloc(4 * sizeof(char));
-
+		if(sd_data->u16_matches[u8_count]){
+		printf("\nvalue of matches: %d, u8_count: %d\n", sd_data->u16_matches[u8_count], u8_count);
 		snprintf(s_tmp_value, 4, "%d,", sd_data->u16_matches[u8_count]);
-		printf("\n result: %s\n", s_tmp_value);
-
+		}else{
+		printf("\nvalue of matches: %d, u8_count: %d\n", sd_data->u16_matches[u8_count], u8_count);
+		strcpy(s_tmp_value, "0,");
+		}
 		strcat(s_sql_cmd, s_tmp_value);
 				
+		printf("\n result: %s\n", s_tmp_value);
 
 		free(s_tmp_value);
-		u8_count++;
+	printf("\nALLES OK\n");
 	}
      	strcat(s_sql_cmd, s_sql_4);
 	

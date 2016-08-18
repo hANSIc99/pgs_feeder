@@ -50,11 +50,10 @@ int main(int argc, const char *argv[])
 
 
 
-	sd_data = s_data(*argv);
-
+	sd_data = s_data(s_json);
 	run_db(sd_data);
 	printf("\nprogram in struct %s\n", sd_data->s_program);
-
+	free(s_json);
 	free_struct_data(sd_data);
 
 	return 0;
