@@ -23,6 +23,7 @@
 #include "struct.h"
 #include "decode_json.h"
 #include "pgs_interface.h"
+#include <log4c.h>
 
 #define MAX_JS_LINE_LENGHT 300
 
@@ -32,6 +33,8 @@ int main(int argc, const char *argv[])
 	struct_data *sd_data;
 	char *s_json;
 	char s_buffer[MAX_JS_LINE_LENGHT];
+
+	log4c_init();
 
 	s_json = calloc(1,1);
 

@@ -5,7 +5,7 @@
 # options I'll pass to the compiler.
 CFLAGS= -c -Wall -std=c11 -Wextra -pedantic -Woverlength-strings -g -O0 -D_GNU_SOURCE 
 # LIBS muss im lezten Schritt angehängt werden
-LIBS = -L/usr/local/lib -lm -ljansson  -lpq
+LIBS = -L/usr/local/lib -lm -ljansson  -lpq -llog4c
 INCLUDES = -I/usr/include/postgresql -I/usr/include/pgsql92
 DEPS = decode_json.h struct.h pgs_interface.h debug.h 
 OBJ = main.o decode_json.o pgs_interface.o debug.o
