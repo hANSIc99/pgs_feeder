@@ -23,9 +23,13 @@
 #include "struct.h"
 #include "decode_json.h"
 #include "pgs_interface.h"
-#include <log4c.h>
+#include "log_var.h"
 
 #define MAX_JS_LINE_LENGHT 300
+
+extern log4c_category_t *log_tracer;
+extern log4c_category_t *log_debug;
+extern log4c_category_t *log_raw;
 
 int main(int argc, const char *argv[])
 {
@@ -34,7 +38,22 @@ int main(int argc, const char *argv[])
 	char *s_json;
 	char s_buffer[MAX_JS_LINE_LENGHT];
 
-	log4c_init();
+	if(log4c_init()){
+	printf("\nlog4c_init() failed\n");
+	exit(1);
+
+
+	}else{
+	
+	log_tracer = log4c_category_get("tracer");
+	log_debug = log4c_category_get("debug");
+	log_raw = log4c_category_get("raw_data");
+
+	log4c_category_log(log_tracer, LOG4C_PRIORITY_TRACE,"%s: %s() -> log4c initialized",
+				   argv[0],
+__func__); 
+
+	}
 
 	s_json = calloc(1,1);
 
