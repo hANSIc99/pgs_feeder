@@ -95,9 +95,6 @@ struct_data *s_data(const char *json)
 
 		sd_data->s_program = strdup(json_string_value(js_program));
 
-		if (DEBUG) {
-			printf("\nProgram: %s\n", sd_data->s_program);
-		}
 		log4c_category_log(log_tracer, LOG4C_PRIORITY_DEBUG, "%s: %s() -> program name: %s",  s_prgrm_name , __func__, sd_data->s_program); 
 	}
 
