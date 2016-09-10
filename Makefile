@@ -11,9 +11,9 @@ DEPS = decode_json.h struct.h pgs_interface.h debug.h log_var.h
 OBJ = main.o decode_json.o pgs_interface.o debug.o
 # the compiler to use.
 CC=gcc $(INCLUDES) 
-all: pgs_feeder
+all: pgs_feeder_1.0
 
-pgs_feeder: $(OBJ)
+pgs_feeder_1.0: $(OBJ)
 	$(CC) $(OBJ) $(LIBS) -o $@ 
 
 
