@@ -5,6 +5,8 @@
 
 struct_data *s_data(const char *json)
 {
+	log4c_category_log(log_tracer, LOG4C_PRIORITY_TRACE, "%s: %s() -> entering s_data()",  s_prgrm_name , __func__); 
+
 
 	json_t *js_root, *js_data, *js_program, *js_tmp, *js_result,
 	    *js_result_obj, *js_array_obj;
@@ -25,20 +27,18 @@ struct_data *s_data(const char *json)
 	js_root = json_loads(json, 0, &error);
 	if (!js_root) {
 
-		/* ERROR */
-		printf("\nAn error occured while creating the JSON object\n");
+	log4c_category_log(log_debug, LOG4C_PRIORITY_ERROR, "%s: %s() -> error while creating json object: %s",  s_prgrm_name , __func__, error.text); 
+
 	}
 
 	if (!(js_data = json_object_get(js_root, "data"))) {
 
-		/* ERROR */
-
-		printf("\nAn error occured while reading the JSON object\n");
+		log4c_category_log(log_debug, LOG4C_PRIORITY_ERROR, "%s: %s() -> error while reading the JSON-object: \"data\"",  s_prgrm_name , __func__); 
 	}
 
 	if (!(js_result = json_object_get(js_data, "result"))) {
-		/* ERROR */
-		printf("\nAn error occured while reading the JSON object\n");
+
+		log4c_category_log(log_debug, LOG4C_PRIORITY_ERROR, "%s: %s() -> error while reading the JSON-object: \"result\"",  s_prgrm_name , __func__); 
 	}
 
 	while ((js_result_obj = json_array_get(js_result, u8_array_pos))) {
@@ -53,47 +53,41 @@ struct_data *s_data(const char *json)
 
 		sd_data->u16_matches[u8_array_pos] =
 		    json_integer_value(js_array_obj);
-		if (1) {
-			printf("\nobject keyword %s value: %d\n",
-			       sd_data->s_search_keyword[u8_array_pos],
-			       sd_data->u16_matches[u8_array_pos]);
-		}
+
+		log4c_category_log(log_tracer, LOG4C_PRIORITY_DEBUG, "%s: %s() -> keyword: %s, value: %d",  s_prgrm_name , __func__, sd_data->s_search_keyword[u8_array_pos], sd_data->u16_matches[u8_array_pos]); 
+
 		++u8_array_pos;
 
 	}
 
 	/* indicates how many keywords are available, necessary to build the table */
+	log4c_category_log(log_tracer, LOG4C_PRIORITY_DEBUG,  "%s: %s() -> keywords available: %d",  s_prgrm_name , __func__, u8_array_pos); 
 
 	sd_data->u8_keywords_present = u8_array_pos;
 
 	if ((js_tmp = json_object_get(js_data, "source"))) {
 
 		sd_data->s_source = strdup(json_string_value(js_tmp));
-		if (DEBUG) {
-			printf("\nSource: %s\n", sd_data->s_source);
-		}
+
+		log4c_category_log(log_tracer, LOG4C_PRIORITY_DEBUG, "%s: %s() -> source: %s",  s_prgrm_name , __func__, sd_data->s_source); 
+
 	}
 	if ((js_tmp = json_object_get(js_data, "customer"))) {
 
 		sd_data->s_customer = strdup(json_string_value(js_tmp));
-		if (DEBUG) {
-			printf("\nCustomer: %s\n", sd_data->s_customer);
-		}
+
+		log4c_category_log(log_tracer, LOG4C_PRIORITY_DEBUG, "%s: %s() -> customer: %s",  s_prgrm_name , __func__, sd_data->s_customer); 
 	}
 	if ((js_tmp = json_object_get(js_data, "pub_date"))) {
-
-		if (DEBUG) {
-			printf("\nPub_Date: %s\n", json_string_value(js_tmp));
-		}
+		/* pub date is not processed actually */
+		log4c_category_log(log_tracer, LOG4C_PRIORITY_DEBUG, "%s: %s() -> pub_date: %s",  s_prgrm_name , __func__, json_string_value(js_tmp)); 
 	}
 
 	if ((js_tmp = json_object_get(js_data, "sys_time"))) {
 
 		sd_data->u32_sys_timestamp = json_integer_value(js_tmp);
-		if (DEBUG) {
-			printf("\nSystem time: %d\n",
-			       sd_data->u32_sys_timestamp);
-		}
+
+		log4c_category_log(log_tracer, LOG4C_PRIORITY_DEBUG, "%s: %s() -> system time: %d",  s_prgrm_name , __func__, sd_data->u32_sys_timestamp); 
 
 	}
 
@@ -104,6 +98,7 @@ struct_data *s_data(const char *json)
 		if (DEBUG) {
 			printf("\nProgram: %s\n", sd_data->s_program);
 		}
+		log4c_category_log(log_tracer, LOG4C_PRIORITY_DEBUG, "%s: %s() -> program name: %s",  s_prgrm_name , __func__, sd_data->s_program); 
 	}
 
 	json_decref(js_root);

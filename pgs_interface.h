@@ -9,6 +9,7 @@
 #include "constants.h"
 #include "struct.h"
 #include "debug.h"
+#include "log_var.h"
 
 #define MAX_SQL_LENGHT 5000
 #define MAX_SQL_COLUMN 500
@@ -20,4 +21,8 @@ struct_db_info *check_create_table(struct_data * sd_data, struct_db_info * db_da
 void free_dbinfo(struct_db_info * db_info);
 uint8_t write_data(struct_db_info *db_data, struct_data *sd_data);
 
+extern log4c_category_t *log_tracer;
+extern log4c_category_t *log_debug;
+extern log4c_category_t *log_raw;
+extern char s_prgrm_name[50] ;
 #endif

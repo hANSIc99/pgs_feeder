@@ -30,6 +30,7 @@
 extern log4c_category_t *log_tracer;
 extern log4c_category_t *log_debug;
 extern log4c_category_t *log_raw;
+extern char s_prgrm_name[50];
 
 int main(int argc, const char *argv[])
 {
@@ -37,6 +38,8 @@ int main(int argc, const char *argv[])
 	struct_data *sd_data;
 	char *s_json;
 	char s_buffer[MAX_JS_LINE_LENGHT];
+
+	strcpy(s_prgrm_name, argv[0]);	
 
 	if(log4c_init()){
 	printf("\nlog4c_init() failed\n");
@@ -49,9 +52,7 @@ int main(int argc, const char *argv[])
 	log_debug = log4c_category_get("debug");
 	log_raw = log4c_category_get("raw_data");
 
-	log4c_category_log(log_tracer, LOG4C_PRIORITY_TRACE,"%s: %s() -> log4c initialized",
-				   argv[0],
-__func__); 
+	log4c_category_log(log_tracer, LOG4C_PRIORITY_TRACE,"%s: %s() -> log4c initialized", argv[0], __func__); 
 
 	}
 
@@ -59,22 +60,22 @@ __func__);
 
 	fflush(stdin);
 
+	/* getting the inpug */
+
 	while(fgets(s_buffer, MAX_JS_LINE_LENGHT, stdin)){
 	s_json = realloc( s_json, ((strlen(s_json) + strlen(s_buffer) * sizeof(char)) + 1));
 	if(!s_json){
-	/* log error here */
+	log4c_category_log(log_debug, LOG4C_PRIORITY_ERROR,"%s: %s() -> realloc failed",   argv[0], __func__); 
+	exit(1);
 	}
 	strcat(s_json, s_buffer);
 	}	
-	printf("\n strlen: %d\n", strlen(s_json));	
+	log4c_category_log(log_tracer, LOG4C_PRIORITY_DEBUG, "%s: %s() -> lenght of string: %lu",   argv[0], __func__, strlen(s_json)); 
+	log4c_category_log(log_raw, LOG4C_PRIORITY_TRACE, "%s: %s() -> stdin string: %s",   argv[0], __func__, s_json); 
 
-	printf("\nFILE: %s\n", s_json);
-
-
-
+	
 	sd_data = s_data(s_json);
 	run_db(sd_data);
-	printf("\nprogram in struct %s\n", sd_data->s_program);
 	free(s_json);
 	free_struct_data(sd_data);
 
